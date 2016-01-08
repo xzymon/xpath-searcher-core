@@ -1,0 +1,26 @@
+[v 0.1.3.Final] [02-01-2016]
++ core.dom package - to represent DOM structure built (and dependent on) on the base of (binary) file): 
+  * DocumentTreeRepresentation - representing [XML/HTML] Document Tree - capable to fix document structure,
+  * DocumentNodeRepresentation - extended
+  * the rest of the package consists of classes for internal processing of building and fixing DocumentTreeRepresentation
++ javadoc for core.dom package,
++ DocumentTreeRepresentation is tested.
+
+[v 0.1.2.Final] [13-12-2015]
+\ a change in POM file.
+
+[v 0.1.1.Final] [13-12-2015]
++ javadoc for many classes // but not for all
++ XPathProcessor split into interface (XPathProcessor) and implementation class (XPathProcessorImpl)
++ XPathSearchingProvider - class recommended to use to get the functionality of searching for XPath expressions in given InputStream
+
+[v 0.1.0.Final] [22-05-2015]
++XPathSearcher - has static methods to search XPath nodes. Uses XPathSearchingListeners to handle found nodes
++XPathSearchingListener - interface to handle with found nodes
++LoggingXPathSearchingListener - simple implementation of XPathSearchingListener for logging found nodes
++SystemOutStreamXPathSearchingListener - simple implementation of XPathSearchingListener for printing found nodes to System.out
+*HTML processing involves removal of tags: head, img, input, br, area, button, script
+*XML processing involves removal of all attributes which names start with "xmlns" 
+
+[v 0.0.1-SNAPSHOT] [13-05-2015]
++ XPathEngineWrapper - to manage XPath searching 

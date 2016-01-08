@@ -1,0 +1,4 @@
+Engine realizuje wyszukiwanie XPath. 
+Trzeba zaimplementować jeszcze inne metody (jak dla konsoli).
+
+Struktura w pełni obiektowa jest potrzebna po to by

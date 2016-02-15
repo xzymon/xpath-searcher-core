@@ -23,41 +23,52 @@ import com.xzymon.xpath_searcher.core.parser.HalfElementRepresentation;
 import com.xzymon.xpath_searcher.core.parser.HalfElementsParser;
 
 public class DocumentTreeRepresentation {
-	private static final Logger logger = LoggerFactory.getLogger(DocumentTreeRepresentation.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DocumentTreeRepresentation.class);
 
 	private DocumentNodeRepresentation rootNode;
 	// private HalfElementsParser heParser;
 
-	private char[] savedSource;
+	private final char[] savedSource;
+	private final HalfElementsParser heParser;
 	
+	
+	public static DocumentTreeRepresentation createFromStream(InputStream is, XmlPreprocessingMode mode, OrphanedPolicies orphanedPolicies){
+		DocumentTreeRepresentation repr = null;
+		try {
+			HalfElementsParser heParser = new HalfElementsParser(is);
+			repr = new DocumentTreeRepresentation(heParser, mode, orphanedPolicies);
+		} catch (ParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return repr;
+	}
+	
+	public static DocumentTreeRepresentation createFromHalfElementsParser(HalfElementsParser heParser, XmlPreprocessingMode mode, OrphanedPolicies orphanedPolicies){
+		DocumentTreeRepresentation repr = null;
+		if(heParser!=null){
+			repr = new DocumentTreeRepresentation(heParser, mode, orphanedPolicies);
+		} else {
+			LOGGER.error("Passed heParser is null!");
+		}
+		return repr;
+	}
 	/**
 	 * 
 	 * @param is
 	 * @param mode - na razie nie ma żadnego wpływu na przetwarzanie (być może zostanie usunięte)
 	 * @param orphanedPolicies
 	 */
-	public DocumentTreeRepresentation(InputStream is, XmlPreprocessingMode mode, OrphanedPolicies orphanedPolicies) {
-		DocumentTreeRepresentation doc = null;
-
-		HalfElementsParser heParser = null;
-
+	private DocumentTreeRepresentation(HalfElementsParser heParser, XmlPreprocessingMode mode, OrphanedPolicies orphanedPolicies) {
+		this.heParser = heParser;
+		
 		OrphanedElementsPolicy policy;
-		
-		char[] chars = null;
-
 		List<HalfElementRepresentation> parserProducedTagList = null;
-		
 		Integer logLength;
 		
-		try {
-			heParser = new HalfElementsParser(is);
-			chars = heParser.getSavedChars();
-			savedSource = chars;
-			parserProducedTagList = heParser.getHalfElementsList();
-		} catch (ParserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		savedSource = heParser.getSavedChars();
+		parserProducedTagList = heParser.getHalfElementsList();
+		
 		if(parserProducedTagList!=null && !parserProducedTagList.isEmpty()){
 			Map<String, TagLocations> tagLocationsMap = new HashMap<String, TagLocations>();
 			TagLocations locs = null;
@@ -99,7 +110,7 @@ public class DocumentTreeRepresentation {
 			for (Entry<String, TagLocations> ent : tagLocationsMap.entrySet()) {
 				tagName = ent.getKey();
 				locs = ent.getValue();
-				logger.info("tag <" + tagName + "> : opening=" + locs.getOpening().size() + ", closing="
+				LOGGER.info("tag <" + tagName + "> : opening=" + locs.getOpening().size() + ", closing="
 						+ locs.getSelfClosing().size() + ", self-closing=" + locs.getClosing());
 			}
 			// algorytm bugujący strukturę obiektową
@@ -126,7 +137,7 @@ public class DocumentTreeRepresentation {
 					curTag = tagList.get(pLoop);
 					curTagState = tagStateList.get(pLoop);
 					if (curTag.isOpening()) {
-						rootNode = DocumentNodeRepresentation.createOpeningNode(curTag, null, curTag.getTagName(chars),
+						rootNode = DocumentNodeRepresentation.createOpeningNode(this, curTag, null, curTag.getTagName(savedSource),
 								pLoop);
 						tagStateList.get(pLoop).setNodeBindingThisTag(rootNode);
 						treeNodeStack.push(rootNode);
@@ -141,20 +152,20 @@ public class DocumentTreeRepresentation {
 					// korzeń jest znany - teraz normalne przetwarzanie - od
 					// kolejnego węzła
 					for (; pLoop < tagsCount; pLoop++) {
-						logger.info("ploop = " + pLoop);
+						LOGGER.info("ploop = " + pLoop);
 						curTag = tagList.get(pLoop);
 						curTagState = tagStateList.get(pLoop);
 						if (curTag.isOther() || curTag.isRaw()) {
-							curNode = DocumentNodeRepresentation.createNamelessNode(curTag, parentNode, null, pLoop);
+							curNode = DocumentNodeRepresentation.createNamelessNode(this, curTag, parentNode, null, pLoop);
 							logLength = curTag.getEndPosition() - curTag.getStartPosition() + 1;
-							logger.info("adding nameless node to treeNodeStack - length=" + logLength );
+							LOGGER.info("adding nameless node to treeNodeStack - length=" + logLength );
 							treeNodeStack.add(curNode);
 							curTagState.setNodeBindingThisTag(curNode);
 							curTagState.setTagTreeBuildingStatus(TagTreeBuildingStatus.BUILT_IN);
 						} else {
 							if (curTag.isOpening()) {
-								curNode = DocumentNodeRepresentation.createOpeningNode(curTag, parentNode,
-										curTag.getTagName(chars), pLoop);
+								curNode = DocumentNodeRepresentation.createOpeningNode(this, curTag, parentNode,
+										curTag.getTagName(savedSource), pLoop);
 								treeNodeStack.add(curNode);
 								parentNode = curNode;
 								curTagState.setNodeBindingThisTag(curNode);
@@ -167,8 +178,8 @@ public class DocumentTreeRepresentation {
 								}
 							}
 							if (curTag.isClosing()) {
-								curTagName = curTag.getTagName(chars);
-								logger.info("poszukiwanie tagu zamykającego dla węzła [" + curTagName + "]");
+								curTagName = curTag.getTagName(savedSource);
+								LOGGER.info("poszukiwanie tagu zamykającego dla węzła [" + curTagName + "]");
 								if(openTags.hasValue(curTagName)){
 									//cofaj się w stosie, przenosząc przetrawione elementy na stos revNodeDeq
 									// dopóki nie znajdziesz poszukiwanego otwartego węzła o tej samej nazwie
@@ -178,23 +189,23 @@ public class DocumentTreeRepresentation {
 										//poniższy warunek powinno dać się skrócić wyrzucając pierwszy test
 										//jeżeli znaleziono nazwany, nie zamknięty węzeł o tej samej nazwie co tag zamykający
 										if(treeNodeName!=null && curTagName.equals(treeNodeName) && !treeNode.isClosed()){
-											logger.info("zamykanie węzła [" + treeNodeName  + "] tagiem o id=" + pLoop);
+											LOGGER.info("zamykanie węzła [" + treeNodeName  + "] tagiem o id=" + pLoop);
 											//zamknij znaleziony węzeł rozpatrywanym tagiem
 											if(treeNode.setClosingTag(curTag, pLoop)){
-												logger.info("zamknięto węzeł [" + treeNodeName  + "] tagiem o id=" + pLoop);
+												LOGGER.info("zamknięto węzeł [" + treeNodeName  + "] tagiem o id=" + pLoop);
 											} else {
-												logger.info("nie zamknięto węzła!");
+												LOGGER.info("nie zamknięto węzła!");
 											}
 											//ustaw powiązanie tagu zamykającego z węzłem
 											tagStateList.get(pLoop).setNodeBindingThisTag(treeNode);
 											//włóż do tego węzła wszystkie węzły z revNodeDeq
 											//while-WKŁADACZ
-											logger.info("przenoszenie węzłów");
+											LOGGER.info("przenoszenie węzłów");
 											while(!revNodeStack.empty()){
-												logger.info("przenoszenie węzła");
+												LOGGER.info("przenoszenie węzła");
 												revNode = revNodeStack.pop();
 												if(!revNode.isRaw() && !revNode.isClosed()){
-													logger.info("węzeł jest błędny - został zbudowany w oparciu o tag[" + revNode.getName() + "] otwierający który sprawia problemy. Węzeł zostanie zniszczony, a tag zostanie przeznaczony do naprawy");
+													LOGGER.info("węzeł jest błędny - został zbudowany w oparciu o tag[" + revNode.getName() + "] otwierający który sprawia problemy. Węzeł zostanie zniszczony, a tag zostanie przeznaczony do naprawy");
 													
 													revId = revNode.getOpeningTagListId();
 													revTagState = tagStateList.get(revId);
@@ -219,7 +230,7 @@ public class DocumentTreeRepresentation {
 												}
 												
 											}
-											logger.info("zakończono przenoszenie węzłów");
+											LOGGER.info("zakończono przenoszenie węzłów");
 											//wstaw właśnie zamknięty węzeł ponownie do stosu i zbioru
 											treeNodeStack.add(treeNode);
 											openTags.put(treeNodeName);
@@ -246,7 +257,7 @@ public class DocumentTreeRepresentation {
 									// nie istnieje odpowiedni tag otwierający - więc curTag jest na pewno błędny
 									//TODO: trzeba od razu zamknąć lub usunąć taki węzeł - zgodnie z obowiązującą 
 									//polityką
-									logger.info("nie istnieje odpowiedni tag otwierający dla [" + curTagName + "] - trzeba będzie go otworzyć lub usunąć");
+									LOGGER.info("nie istnieje odpowiedni tag otwierający dla [" + curTagName + "] - trzeba będzie go otworzyć lub usunąć");
 									tagStateList.get(pLoop).setTagTreeBuildingStatus(TagTreeBuildingStatus.SKIPPED);
 									tagLocationsMap.get(curTagName).addProblematic(pLoop);
 								}
@@ -259,14 +270,14 @@ public class DocumentTreeRepresentation {
 						if(rootNode.getOpeningTag()!=null){
 							tagStateList.get(rootNode.getOpeningTagListId()).setTagTreeBuildingStatus(TagTreeBuildingStatus.BUILT_IN);
 						} else {
-							logger.info("rootNode.getOpeningTag() == null !");
+							LOGGER.info("rootNode.getOpeningTag() == null !");
 						}
 						if(rootNode.getClosingTag()!=null){
 							tagStateList.get(rootNode.getClosingTagListId()).setTagTreeBuildingStatus(TagTreeBuildingStatus.BUILT_IN);
 						} else {
-							logger.info("rootNode.getClosingTag() == null !");
+							LOGGER.info("rootNode.getClosingTag() == null !");
 						}
-						logger.info("struktura jest prawidłowa - tj. rootNode jest zamknięty");
+						LOGGER.info("struktura jest prawidłowa - tj. rootNode jest zamknięty");
 						//logger.info("test referencji tagu zamykającego węzła - czy nie jest null? :" + ((tagStateList.get(rootNode.getClosingTagListId()).getNodeBindingThisTag()!=null)?"nie jest":"jest"));
 	/* UWAGA: zmiana */ openTags.clear(); //chyba nic to nie wnosi
 						// trzeba najpierw zebrać wszystkie problematyczne tagi
@@ -289,24 +300,24 @@ public class DocumentTreeRepresentation {
 						DocumentNodeRepresentation pcNode, ldNode;
 						// dopuki z problematicTags da się wyciągać id tagów
 						while((skippedTagId = problematicTags.pollFirst())!=null){
-							logger.info("przetwarzanie kolejnego problematycznego tagu o id=" + skippedTagId);
+							LOGGER.info("przetwarzanie kolejnego problematycznego tagu o id=" + skippedTagId);
 							//najpierw trzeba ponownie włożyć to id - jego usunięciem na dobre zajmie się dalszy kod
 							problematicTags.add(skippedTagId);
 							//znajdź węzeł obudowujący - czyli taki który może się stać rodzicem
 							// dla naprawianego tagu - nie możesz wyjść dalej niż poza rootNode
 							skippedPredId = skippedTagId;
 							while((--skippedPredId)>=rootOpeningTagId && tagStateList.get(skippedTagId).isStatusSkipped()){
-								logger.info("szukanie węzła obudowującego tag o id=" + skippedTagId + ": rozpatrywany kandydat - skippedPredId=" + skippedPredId);
+								LOGGER.info("szukanie węzła obudowującego tag o id=" + skippedTagId + ": rozpatrywany kandydat - skippedPredId=" + skippedPredId);
 								pcTag = tagList.get(skippedPredId);
 								if(pcTag.isOpening() && !pcTag.isSelfClosing()){
-									logger.info("tag otwierający i nie samozamykający się");
+									LOGGER.info("tag otwierający i nie samozamykający się");
 									openingTagId = skippedPredId;
 									pcTagState = tagStateList.get(skippedPredId);
 									pcNode = pcTagState.getNodeBindingThisTag();
-									logger.info("czy powiązany węzeł jest null? :" + ((pcNode==null)?"tak":"nie"));
+									LOGGER.info("czy powiązany węzeł jest null? :" + ((pcNode==null)?"tak":"nie"));
 									if(pcNode!=null && pcNode.isClosed() && !pcNode.isFixedBySelfClosing()){
 										pcClosingId = pcNode.getClosingTagListId();
-										logger.info("węzeł jest zamknięty - to obiecujące... id zamykającego tagu to pcClosingId=" + pcClosingId);
+										LOGGER.info("węzeł jest zamknięty - to obiecujące... id zamykającego tagu to pcClosingId=" + pcClosingId);
 										if(pcClosingId > skippedTagId){
 											// znaleziono węzeł obudowujący
 											parentNode = pcNode;
@@ -319,13 +330,13 @@ public class DocumentTreeRepresentation {
 											//przejdź przez wnętrze obszaru między openinigTag i closingTag
 											//i włącz przetwarzanie wszystkich SKIPPED
 											includingTagId = openingTagId + 1;
-											logger.info("granice naprawianego obszaru : <" + openingTagId + ";" + closingTagId + ">");
+											LOGGER.info("granice naprawianego obszaru : <" + openingTagId + ";" + closingTagId + ">");
 											while(includingTagId<closingTagId){
-												logger.info("analiza naprawianego obszaru - czy aktywować przetwarzanie includingTagId=" + includingTagId + " ?");
+												LOGGER.info("analiza naprawianego obszaru - czy aktywować przetwarzanie includingTagId=" + includingTagId + " ?");
 												includingTagState = tagStateList.get(includingTagId);
 												if(includingTagState.isStatusSkipped()){
 													includingTagState.setParsingParticipationState(ParsingParticipationState.INCLUDED);
-													logger.info("aktywacja przetwarzania dla includingTagId=" + includingTagId);
+													LOGGER.info("aktywacja przetwarzania dla includingTagId=" + includingTagId);
 												}
 												includingTagId++;
 											}
@@ -347,15 +358,15 @@ public class DocumentTreeRepresentation {
 														if(chOpenTagId!=null){
 															chCloseTagId = childNode.getClosingTagListId();
 															tagStateList.get(chOpenTagId).setParsingParticipationState(ParsingParticipationState.INCLUDED);
-															logger.info("włączanie przetwarzania dla chOpenTagId=" + chOpenTagId);
+															LOGGER.info("włączanie przetwarzania dla chOpenTagId=" + chOpenTagId);
 															if(!childNode.isSelfClosing()){
 																excludingTagId = new Integer(chOpenTagId);
 																while((++excludingTagId) < chCloseTagId){
 																	tagStateList.get(excludingTagId).setParsingParticipationState(ParsingParticipationState.EXCLUDED);
-																	logger.info("wyłączanie z przetwarzania dla excludingTagId=" + excludingTagId);
+																	LOGGER.info("wyłączanie z przetwarzania dla excludingTagId=" + excludingTagId);
 																}
 																tagStateList.get(chCloseTagId).setParsingParticipationState(ParsingParticipationState.EXCLUDED);
-																logger.info("wyłączanie z przetwarzania dla chCloseTagId=" + chCloseTagId);
+																LOGGER.info("wyłączanie z przetwarzania dla chCloseTagId=" + chCloseTagId);
 															}
 														} else {
 															//node musi być zbudowany w oparciu o FIXED isClosed tag
@@ -382,30 +393,30 @@ public class DocumentTreeRepresentation {
 												includingTagState = tagStateList.get(incLoop);
 												if(includingTagState.getParsingParticipationState().equals(ParsingParticipationState.INCLUDED)){
 													fixingTagDeq.add(incLoop);
-													logger.info("kolejkowanie tagu o id=" + incLoop + " do fixingTagDeq - ponieważ jest INCLUDED");
+													LOGGER.info("kolejkowanie tagu o id=" + incLoop + " do fixingTagDeq - ponieważ jest INCLUDED");
 												}
 											}
 											//przetwórz wyciągając z kolejki
 											while(fixingTagDeq.peek()!=null){
 												dequedId = fixingTagDeq.poll();
-												logger.info("wyciąganie z kolejki fixingTagDeq: wyciągnięto (i włożono ponownie) dequedId=" + dequedId );
+												LOGGER.info("wyciąganie z kolejki fixingTagDeq: wyciągnięto (i włożono ponownie) dequedId=" + dequedId );
 												dequedTag = tagList.get(dequedId);
 												dequedTagState = tagStateList.get(dequedId);
-												logger.info("status wyciągniętego tagu to:" + dequedTagState.getTagTreeBuildingStatus());
+												LOGGER.info("status wyciągniętego tagu to:" + dequedTagState.getTagTreeBuildingStatus());
 												// przez domniemanie tag jest nazwany, gdyż gdyby nie był nazwany
 												// to już wcześniej zostałby prawidłowo wbudowany w drzewo
 												if(dequedTagState.isStatusSkipped()){
-													logger.info("tag jest SKIPPED; jeżeli jest otwierający - to trzeba go zamknąć; jeżeli jest zamykający - to trzeba go otworzyć lub usunąć");
-													dequedTagName = dequedTag.getTagName(chars);
+													LOGGER.info("tag jest SKIPPED; jeżeli jest otwierający - to trzeba go zamknąć; jeżeli jest zamykający - to trzeba go otworzyć lub usunąć");
+													dequedTagName = dequedTag.getTagName(savedSource);
 													policy = orphanedPolicies.getPolicyForTag(dequedTagName);
 													if(dequedTag.isOpening()){
-														logger.info("tag [" + dequedId + "] jest otwierający - trzeba go zamknąć");
+														LOGGER.info("tag [" + dequedId + "] jest otwierający - trzeba go zamknąć");
 														//tag wymaga zamknięcia
 														switch(policy.getOpeningMode()){
 														case DEFAULT:
 															//stwórz i wstaw do drzewa węzeł zbudowany na otwierającym tagu - zamknij go wirtualnym tagiem
-															logger.info("zamknięcie DEFAULT dla tagu " + dequedTagName);
-															fixedNode = DocumentNodeRepresentation.createOpeningNode(dequedTag, parentNode, dequedTagName, dequedId);
+															LOGGER.info("zamknięcie DEFAULT dla tagu " + dequedTagName);
+															fixedNode = DocumentNodeRepresentation.createOpeningNode(this, dequedTag, parentNode, dequedTagName, dequedId);
 															fixedNode.fixByClosingAtTagId(dequedId);
 															dequedTagState.setNodeBindingThisTag(fixedNode);
 															parentNode.addChild(fixedNode);
@@ -415,8 +426,8 @@ public class DocumentTreeRepresentation {
 															break;
 														case SELF_CLOSED:
 															//stwórz i wstaw do drzewa węzeł zbudowany na otwierającym tagu - zamknij go wewnętrznym samozamknięciem
-															logger.info("zamknięcie SELF_CLOSED dla tagu " + dequedTagName);
-															fixedNode = DocumentNodeRepresentation.createOpeningNode(dequedTag, parentNode, dequedTagName, dequedId);
+															LOGGER.info("zamknięcie SELF_CLOSED dla tagu " + dequedTagName);
+															fixedNode = DocumentNodeRepresentation.createOpeningNode(this, dequedTag, parentNode, dequedTagName, dequedId);
 															fixedNode.fixBySelfClosing();
 															dequedTagState.setNodeBindingThisTag(fixedNode);
 															parentNode.addChild(fixedNode);
@@ -426,33 +437,33 @@ public class DocumentTreeRepresentation {
 															break;
 														case CLOSE_ON_NEXT_SAME_SPECIES:
 															//trzeba znaleźć następny tag otwierający tego samego gatunku albo dowieść że taki nie istnieje w obrębie tego parentNode
-															logger.info("zamknięcie CLOSE_ON_NEXT_SAME_SPECIES dla tagu " + dequedTagName);
-															fixedNode = DocumentNodeRepresentation.createOpeningNode(dequedTag, parentNode, dequedTagName, dequedId);
+															LOGGER.info("zamknięcie CLOSE_ON_NEXT_SAME_SPECIES dla tagu " + dequedTagName);
+															fixedNode = DocumentNodeRepresentation.createOpeningNode(this, dequedTag, parentNode, dequedTagName, dequedId);
 															while((speciesId = fixingTagDeq.peek())!=null){
 																speciesTag = tagList.get(speciesId);
 																speciesTagState = tagStateList.get(speciesId);
-																speciesTagName = speciesTag.getTagName(chars);
-																logger.info("poszukiwanie kolejnego tagu otwierającego: testowanie tagu " + speciesTagName + " o speciesId=" + speciesId);
+																speciesTagName = speciesTag.getTagName(savedSource);
+																LOGGER.info("poszukiwanie kolejnego tagu otwierającego: testowanie tagu " + speciesTagName + " o speciesId=" + speciesId);
 																if(speciesTagName!=null && speciesTagName.equals(dequedTagName)){
-																	logger.info("znaleziono następny tag tego samego gatunku [gatunek=" + dequedTagName + "] - można zamykać");
+																	LOGGER.info("znaleziono następny tag tego samego gatunku [gatunek=" + dequedTagName + "] - można zamykać");
 																	//znaleziony tag tego samego gatunku należy pozostawić w kolejce
 																	// - bo być może jest istotny dla dalszego przetwarzania
 																	fixedNode.fixByClosingAtTagId(speciesId);
 																	break;
 																} else {
-																	logger.info("testowany tag nie jest tego samego gatunku [poszukiwany gatunek=" + dequedTagName + "] zatem:");
+																	LOGGER.info("testowany tag nie jest tego samego gatunku [poszukiwany gatunek=" + dequedTagName + "] zatem:");
 																	if((moveNode = speciesTagState.getNodeBindingThisTag())!=null){
-																		logger.info(" - w oparciu o ten tag istnieje węzeł - wykonywanie przepinania pod " + dequedTagName);
+																		LOGGER.info(" - w oparciu o ten tag istnieje węzeł - wykonywanie przepinania pod " + dequedTagName);
 																		moveNode.getParent().removeChild(moveNode);
 																		moveNode.setParent(fixedNode);
 																		fixedNode.addChild(moveNode);
 																	}
-																	logger.info(" - wywalanie z kolejki!");
+																	LOGGER.info(" - wywalanie z kolejki!");
 																	fixingTagDeq.poll();
 																}
 															}
 															if(speciesId==null){
-																logger.info("kolejka została wyczerpana a nie znaleziono tagu tego samego gatunku [gatunek=" + dequedTagName + "] - trzeba zamknąć tagiem zamykającym parentNode");
+																LOGGER.info("kolejka została wyczerpana a nie znaleziono tagu tego samego gatunku [gatunek=" + dequedTagName + "] - trzeba zamknąć tagiem zamykającym parentNode");
 																// - zatem tag zamykający to tag zamykający z parentNode
 																fixedNode.fixByClosingAtTagId(closingTagId);
 															}
@@ -465,27 +476,27 @@ public class DocumentTreeRepresentation {
 														}
 													}
 													if(dequedTag.isClosing()){
-														logger.info("tag [" + dequedId + "] jest zamykający - trzeba go otworzyć albo usunąć");
+														LOGGER.info("tag [" + dequedId + "] jest zamykający - trzeba go otworzyć albo usunąć");
 														tagStateList.get(dequedId).setTagTreeBuildingStatus(TagTreeBuildingStatus.SKIPPED);
 														
 														policy = orphanedPolicies.getPolicyForTag(dequedTagName);
 														if(policy.isClosingDefault()){
-															logger.info("dostarczona polityka narzuca otwarcie tagu");
-															logger.info("tworzenie nowego węzła [" + dequedTagName + ", id=" + dequedId + "] z parentNode=" + parentNode.getName());
-															curNode = DocumentNodeRepresentation.createClosingNode(dequedTag, parentNode, dequedTagName, dequedId);
+															LOGGER.info("dostarczona polityka narzuca otwarcie tagu");
+															LOGGER.info("tworzenie nowego węzła [" + dequedTagName + ", id=" + dequedId + "] z parentNode=" + parentNode.getName());
+															curNode = DocumentNodeRepresentation.createClosingNode(this, dequedTag, parentNode, dequedTagName, dequedId);
 															parentNode.addChild(curNode);
 															curNode.fixByOpeningAtClosingTagId();
 															dequedTagState.setParsingParticipationState(ParsingParticipationState.EXCLUDED);
 															tagStateList.get(dequedId).setTagTreeBuildingStatus(TagTreeBuildingStatus.FIXED);
 															problematicTags.remove(dequedId);
-															logger.info("nowy węzeł [" + dequedTagName + " utworzony i wstawiony do drzewa z parentNode=" + curNode.getParent().getName());
+															LOGGER.info("nowy węzeł [" + dequedTagName + " utworzony i wstawiony do drzewa z parentNode=" + curNode.getParent().getName());
 														}
 														if(policy.isClosingRemove()){
-															logger.info("dostarczona polityka narzuca usunięcie tagu");
+															LOGGER.info("dostarczona polityka narzuca usunięcie tagu");
 															dequedTagState.setParsingParticipationState(ParsingParticipationState.EXCLUDED);
 															tagStateList.get(dequedId).setTagTreeBuildingStatus(TagTreeBuildingStatus.REMOVED);
 															problematicTags.remove(dequedId);
-															logger.info("tag [" + dequedTagName + ", id=" + dequedId + "] został usunięty");
+															LOGGER.info("tag [" + dequedTagName + ", id=" + dequedId + "] został usunięty");
 														}
 													}
 												}
@@ -497,7 +508,7 @@ public class DocumentTreeRepresentation {
 											if(tagToCleanId<tagsCount){
 												TagState tagToCleanState = tagStateList.get(tagToCleanId);
 												while(!tagToCleanState.isStateOuter()){
-													logger.info("czyszczenie tagu o id=" + tagToCleanId + " (ustawianie na OUTER)");
+													LOGGER.info("czyszczenie tagu o id=" + tagToCleanId + " (ustawianie na OUTER)");
 													tagToCleanState.setParsingParticipationState(ParsingParticipationState.OUTER);
 													tagToCleanId++;
 													if(tagToCleanId<tagsCount){
@@ -513,7 +524,7 @@ public class DocumentTreeRepresentation {
 						}
 					}
 				} else {
-					logger.info("There is no root node!");
+					LOGGER.info("There is no root node!");
 				}
 			}
 		}// tu if(heParser!=null) się kończy
@@ -523,6 +534,10 @@ public class DocumentTreeRepresentation {
 		return this.rootNode;
 	}
 
+	public char[] getSavedSource(){
+		return this.savedSource;
+	}
+	
 	public DocumentNodeIterator iterator() {
 		return new DocumentNodeIterator(this.rootNode);
 	}

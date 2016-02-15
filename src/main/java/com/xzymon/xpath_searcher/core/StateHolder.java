@@ -67,7 +67,19 @@ public interface StateHolder {
 	 * @return
 	 */
 	AttributeRepresentation getBoundAttributeRepresentation(Node node);
+	/**
+	 * Zwraca zarejestrowane {@link XPathSearchingListener}'y jako {@link java.util.List}
+	 * @return
+	 */
 	List<XPathSearchingListener> getSearchingListeners();
+	/**
+	 * Rejestruje przekazany listener do nasłuchiwania zdarzeń na tym obiekcie
+	 * @param listener
+	 */
 	void addSearchingListener(XPathSearchingListener listener);
+	/**
+	 * Wyrejestrowuje przekazany listener z nasłuchiwania zdarzeń na tym obiekcie
+	 * @param listener
+	 */
 	void removeSearchingListener(XPathSearchingListener listener);
 }

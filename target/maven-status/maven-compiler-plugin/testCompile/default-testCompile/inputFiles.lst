@@ -1,0 +1,6 @@
+/root/git/xpath-searcher-core/src/test/java/com/xzymon/xpath_searcher/core/dom/DocumentNodeRepresentationUsingHTMLDefaultOrphanedPolicies.java
+/root/git/xpath-searcher-core/src/test/java/com/xzymon/xpath_searcher/core/dom/HalfElementRepresentationStringifyTest.java
+/root/git/xpath-searcher-core/src/test/java/com/xzymon/xpath_searcher/core/dom/CountingSetTest.java
+/root/git/xpath-searcher-core/src/test/java/com/xzymon/xpath_searcher/test/XPathSearchingProviderTest.java
+/root/git/xpath-searcher-core/src/test/java/com/xzymon/xpath_searcher/test/XPathSearchingProvider_BigTest.java
+/root/git/xpath-searcher-core/src/test/java/com/xzymon/xpath_searcher/core/dom/DocumentNodeRepresentationArtificialStringifyTest.java

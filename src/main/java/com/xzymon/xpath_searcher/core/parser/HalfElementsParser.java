@@ -49,6 +49,8 @@ public class HalfElementsParser {
 	private LinkedList<DetectorMode> modeList = null;
 	private LinkedList<ControlPoint> controlPoints = null;
 	private LinkedList<HalfElementRepresentation> slicesR = null;
+	
+	private NodeRepresentation builtStructure = null;
 
 	private List<ParserListener> parserListeners;
 
@@ -193,7 +195,10 @@ public class HalfElementsParser {
 	}
 
 	public NodeRepresentation buildStructure() throws BuildingDOMException {
-		return NodeRepresentation.buildStructure(slicesR, savedChars);
+		if(this.builtStructure==null){
+			this.builtStructure = NodeRepresentation.buildStructure(slicesR, savedChars);
+		}
+		return this.builtStructure;
 	}
 	
 	public List<HalfElementRepresentation> getHalfElementsList(){

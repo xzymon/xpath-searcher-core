@@ -56,8 +56,7 @@ public class DocumentNodeRepresentationUsingHTMLDefaultOrphanedPolicies {
 +"</p></li></ul>"
 +"</body></html>";
 		savedStream = input.getBytes();
-		tree = new DocumentTreeRepresentation(new ByteArrayInputStream(savedStream), XmlPreprocessingMode.ASSUME_HTML,
-				htmlDefaultPolicies);
+		tree = DocumentTreeRepresentation.createFromStream(new ByteArrayInputStream(savedStream), XmlPreprocessingMode.ASSUME_HTML, htmlDefaultPolicies);
 		actual = tree.stringifyTree();
 		logger.info("input is [" + input + "]");
 		logger.info("expected is [" + expected + "]");
@@ -116,8 +115,7 @@ public class DocumentNodeRepresentationUsingHTMLDefaultOrphanedPolicies {
 				+"\t</script>\n"
 				+"</body></html>";
 		savedStream = input.getBytes();
-		tree = new DocumentTreeRepresentation(new ByteArrayInputStream(savedStream), XmlPreprocessingMode.ASSUME_HTML,
-				htmlDefaultPolicies);
+		tree = DocumentTreeRepresentation.createFromStream(new ByteArrayInputStream(savedStream), XmlPreprocessingMode.ASSUME_HTML, htmlDefaultPolicies);
 		actual = tree.stringifyTree();
 		logger.info("input is [" + input + "]");
 		logger.info("expected is [" + expected + "]");
@@ -129,8 +127,7 @@ public class DocumentNodeRepresentationUsingHTMLDefaultOrphanedPolicies {
 		input = "";
 		expected = "";
 		savedStream = input.getBytes();
-		tree = new DocumentTreeRepresentation(new ByteArrayInputStream(savedStream), XmlPreprocessingMode.ASSUME_HTML,
-				htmlDefaultPolicies);
+		tree = DocumentTreeRepresentation.createFromStream(new ByteArrayInputStream(savedStream), XmlPreprocessingMode.ASSUME_HTML, htmlDefaultPolicies);
 		actual = tree.stringifyTree();
 		logger.info("input is [" + input + "]");
 		logger.info("expected is [" + expected + "]");

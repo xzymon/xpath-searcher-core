@@ -8,6 +8,8 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xzymon.xpath_searcher.core.dom.DocumentNestedText;
+import com.xzymon.xpath_searcher.core.dom.DocumentNodeChild;
 import com.xzymon.xpath_searcher.core.exception.IsNamedTagException;
 import com.xzymon.xpath_searcher.core.exception.IsNotClosingTagException;
 import com.xzymon.xpath_searcher.core.exception.IsNotOpeningTagException;
@@ -31,10 +33,12 @@ public class DocumentNodeRepresentation implements Comparable<DocumentNodeRepres
 
 	private DocumentNodeRepresentation parent;
 	private NavigableSet<DocumentNodeRepresentation> children;
+	private DocumentTreeRepresentation tree;
 
-	private DocumentNodeRepresentation(HalfElementRepresentation opening, HalfElementRepresentation closing,
+	private DocumentNodeRepresentation(DocumentTreeRepresentation owningTree, HalfElementRepresentation opening, HalfElementRepresentation closing,
 			HalfElementRepresentation raw, DocumentNodeRepresentation parent, String name, Integer firstId, Integer lastId)
 					throws IsNotOpeningTagException, IsNotClosingTagException, IsNamedTagException {
+		this.tree = owningTree;
 		this.fixType = ClosingFixType.NONE;
 		this.firstTagListId = firstId;
 		this.lastTagListId = lastId;
@@ -72,11 +76,11 @@ public class DocumentNodeRepresentation implements Comparable<DocumentNodeRepres
 		}
 	}
 	
-	public static DocumentNodeRepresentation createOpeningNode(HalfElementRepresentation openingNode, 
+	public static DocumentNodeRepresentation createOpeningNode(DocumentTreeRepresentation owningTree, HalfElementRepresentation openingNode, 
 			DocumentNodeRepresentation parent, String name, int firstId){
 		DocumentNodeRepresentation newNode = null;
 		try {
-			newNode = new DocumentNodeRepresentation(openingNode, null, null, parent, name, firstId, null);
+			newNode = new DocumentNodeRepresentation(owningTree, openingNode, null, null, parent, name, firstId, null);
 		} catch (IsNotOpeningTagException e) {
 			e.printStackTrace();
 		} catch (IsNotClosingTagException e) {
@@ -87,11 +91,11 @@ public class DocumentNodeRepresentation implements Comparable<DocumentNodeRepres
 		return newNode;
 	}
 	
-	public static DocumentNodeRepresentation createClosingNode(HalfElementRepresentation closingTag, 
+	public static DocumentNodeRepresentation createClosingNode(DocumentTreeRepresentation owningTree, HalfElementRepresentation closingTag, 
 			DocumentNodeRepresentation parent, String name, int lastId){
 		DocumentNodeRepresentation newNode = null;
 		try {
-			newNode = new DocumentNodeRepresentation(null, closingTag, null, parent, name, null, lastId);
+			newNode = new DocumentNodeRepresentation(owningTree, null, closingTag, null, parent, name, null, lastId);
 		} catch (IsNotOpeningTagException e) {
 			e.printStackTrace();
 		} catch (IsNotClosingTagException e) {
@@ -102,11 +106,11 @@ public class DocumentNodeRepresentation implements Comparable<DocumentNodeRepres
 		return newNode;
 	}
 	
-	public static DocumentNodeRepresentation createNamelessNode(HalfElementRepresentation namelessNode, 
+	public static DocumentNodeRepresentation createNamelessNode(DocumentTreeRepresentation owningTree, HalfElementRepresentation namelessNode, 
 			DocumentNodeRepresentation parent, String name, int firstId){
 		DocumentNodeRepresentation newNode = null;
 		try {
-			newNode = new DocumentNodeRepresentation(null, null, namelessNode, parent, name, firstId, null);
+			newNode = new DocumentNodeRepresentation(owningTree, null, null, namelessNode, parent, name, firstId, null);
 		} catch (IsNotOpeningTagException e) {
 			e.printStackTrace();
 		} catch (IsNotClosingTagException e) {
@@ -414,4 +418,13 @@ public class DocumentNodeRepresentation implements Comparable<DocumentNodeRepres
 		
 		return sb;
 	}
+	
+	public boolean belongsToAnyTree(){
+		return this.tree!=null;
+	}
+	
+	public DocumentTreeRepresentation getTree(){
+		return this.tree;
+	}
+	
 }

@@ -1,4 +1,80 @@
+Plany dot. realizacji wersji 0.1.5, a może nawet 0.2.0 - z uwagi na skalę zmian
+
+Ogólna koncepcja jest taka by udostępnione były następujące funkcjonalności:
+1) przedwstępne filtrowanie strumienia z pliku w celu odrzucenia nagłówka dokumentu lub XMLNamespace(tu: warunkowe)
+	obecnie realizowane przez com.xzymon.xpath_searcher.core.converter.XPathSearchableStream
+	- być może potrzebna będzie zmiana API
+	- być może potrzebna będzie zmiana nazwy - ta jest chyba dość nieintuicyjna
+2) przetworzenie strumienia w celu naprawy błędów - brakujących lub nieprawidłowych tagów - i zwrócenie zmodyfikowanego "strumienia"
+3) budowa drzewa dokumentu na bazie otrzymanego strumienia (ten strumień może zawierać błędy - mają zostać naprawione)
+4) przetwarzanie zbudowanego drzewa dokumentu:
+    a) klonowanie całej struktury
+    b) odfiltrowanie wskazanych tagów (a więc usunięcie ich oraz ich dzieci z drzewa dokumentu)
+    c) usunięcie tagów we wskazanym położeniu
+    d) poruszanie po drzewie zgodnie z regułami XPath (lub raczej : pewnym podzbiorem reguł)
+    e) wydobywanie wartości z węzłów, lub atrybutów - jak value() w XPath
+5) zwrócenie naprawionego strumienia w postaci sformatowanej
+6) zwrócenie (naprawionego) drzewa w postaci sformatowanego strumienia
+
+Dobrze byłoby konstruować obiekty z wykorzystaniem metod statycznych
+np.
+	XPathSearcher searcher = XPathSearcher.createFromXMLStream(InputStream is, boolean ignoreNamespace);
+	XPathSearcher searcher = XPathSearcher.createFromHTMLStream(InputStream is);
+
+przykłady oczekiwanego użycia:
+	searcher.getNodesWithName(String name);
+	searcher.getNodesWithAttribute(String attributeName);
+	searcher.getNodesByXPath(String xpath);
+	searcher.getNodesByXPath(String xpath).removeAll();
+	searcher.getNodesByXPath(String xpath).addFirstNode(Node node);
+	searcher.getNodesByXPath(String xpath).addLastNode(Node node);
+	searcher.getNodesByXPath(String xpath).addAttribute(String attrName, String attrValue);
+	
+	searcher.getNodesByXPath(String xpath).all().remove();
+	searcher.getNodesByXPath(String xpath).all().replace(Node node);
+	searcher.getNodesByXPath(String xpath).all().children().add(Node node);
+	searcher.getNodesByXPath(String xpath).all().addAttribute(String name, String value);
+	searcher.getNodesByXPath(String xpath).nth(int n).			-> zwraca 1 węzeł
+	searcher.getNodesByXPath(String xpath).backwardNth(int n).	-> zwraca 1 węzeł
+	searcher.getNodesByXPath(String xpath).first().				-> zwraca 1 węzeł
+	searcher.getNodesByXPath(String xpath).last().				-> zwraca 1 węzeł
+	searcher.getNodesByXPath(String xpath).range(int rangeStart, int nodesCount).
+	searcher.getNodesByXPath(String xpath).backwardRange(int rangeStart, int nodesCount).
+	searcher.getNodesByXPath(String xpath).nth().children().first().
+	searcher.getNodesByXPath(String xpath).nth().children().last().
+	searcher.getNodesByXPath(String xpath).nth().children().nth().
+	searcher.getNodesByXPath(String xpath).nth().children().nth().
+	
+	searcher.getNodesByXPath(String xpath).nth().attributes().get(String name)
+	searcher.getNodesByXPath(String xpath).nth().attributes().get(String name).remove();
+	searcher.getNodesByXPath(String xpath).nth().attributes().get(String name).replace(String name);
+	searcher.getNodesByXPath(String xpath).nth().attributes().get(String name).replace(String name, String value);
+	
+	searcher.getNodesByXPath(String xpath).nth().attributes().getIf(String name, String value)
+	searcher.getNodesByXPath(String xpath).nth().attributes().getIf(String name, String value).remove();
+	searcher.getNodesByXPath(String xpath).nth().attributes().getIf(String name, String value).replace(String name);
+	searcher.getNodesByXPath(String xpath).nth().attributes().getIf(String name, String value).replace(String name, String value);
+	
+
+com.xzymon.xpath_searcher.core
+ - zmodyfikować DefaultStateHolderWrapper - by nie używał JSoup
+
 Engine realizuje wyszukiwanie XPath. 
 Trzeba zaimplementować jeszcze inne metody (jak dla konsoli).
 
-Struktura w pełni obiektowa jest potrzebna po to by
+
+
+Trzeba przenieść funkcjonalność XMLStateHolder'a do XPathSearcher'a
+
+Jakie API jest potrzebne bibliotece:
+ - umożliwiające wyszukiwanie w [naprawionym] dokumencie 
+ 	-> XPathSearcher
+ - umożliwiające przeszukiwanie zbudowanego drzewa dokumentu w poszukiwaniu węzłów spełniających XPath
+ 	-> XPathSearcher
+ 
+ 
+Obecnie jest problem z przetwarzaniem komentarzy XML - gdy komentarz zawiera wewnątrz tag XML.
+Trzeba to naprawić tak by zawartość komentarza ABSOLUTNIE nie podlegała dalszemu przetwarzaniu.
+ 
+Należy też opracować uzyskiwanie całkowicie obiektowej wersji drzewa dokumentu
+ - chociażby by móc sprawdzać rzeczywistą strukturę drzewa (tego już naprawionego)

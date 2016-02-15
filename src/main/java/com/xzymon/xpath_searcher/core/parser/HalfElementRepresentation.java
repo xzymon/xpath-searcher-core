@@ -182,7 +182,7 @@ public class HalfElementRepresentation {
 		interiors.add(interior);
 	}
 	
-	public String fromSavedChars(char[] chars, int startPos, int endPos){
+	public static String fromSavedChars(char[] chars, int startPos, int endPos){
 		int length = endPos-startPos+1;
 		return new String(chars, startPos, length);
 	}
@@ -194,7 +194,7 @@ public class HalfElementRepresentation {
 	 * @param endPos
 	 * @return
 	 */
-	public StringBuffer fromSavedCharsAsStringBuffer(char[] chars, int startPos, int endPos){
+	public static StringBuffer fromSavedCharsAsStringBuffer(char[] chars, int startPos, int endPos){
 		int length = endPos-startPos+1;
 		StringBuffer sb = new StringBuffer();
 		return sb.append(chars, startPos, length);

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="30" failures="0" name="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" time="4.126" errors="0" skipped="0">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="/opt/jdk1.8.0_60/jre/lib/amd64"/>
+    <property name="java.vm.version" value="25.60-b23"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="maven.multiModuleProjectDirectory" value="/home/szymon/${workspace_loc:/xpath-searcher-core}"/>
+    <property name="java.vendor.url" value="http://java.oracle.com/"/>
+    <property name="path.separator" value=":"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.country" value="PL"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="/root/git/xpath-searcher-core"/>
+    <property name="java.runtime.version" value="1.8.0_60-b27"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="/opt/jdk1.8.0_60/jre/lib/endorsed"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="os.name" value="Linux"/>
+    <property name="classworlds.conf" value="/root/workspace/.metadata/.plugins/org.eclipse.m2e.launching/launches/m2conf6710050023135395076.tmp"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="52.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="4.2.0-27-generic"/>
+    <property name="user.home" value="/root"/>
+    <property name="user.timezone" value="Europe/Warsaw"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.specification.version" value="1.8"/>
+    <property name="user.name" value="root"/>
+    <property name="java.class.path" value="/opt/maven/boot/plexus-classworlds-2.5.2.jar"/>
+    <property name="java.vm.specification.version" value="1.8"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="/opt/jdk1.8.0_60/jre"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -B -s /opt/maven/conf/settings.xml test install"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.language" value="pl"/>
+    <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.8.0_60"/>
+    <property name="java.ext.dirs" value="/opt/jdk1.8.0_60/jre/lib/ext:/usr/java/packages/lib/ext"/>
+    <property name="securerandom.source" value="file:/dev/./urandom"/>
+    <property name="sun.boot.class.path" value="/opt/jdk1.8.0_60/jre/lib/resources.jar:/opt/jdk1.8.0_60/jre/lib/rt.jar:/opt/jdk1.8.0_60/jre/lib/sunrsasign.jar:/opt/jdk1.8.0_60/jre/lib/jsse.jar:/opt/jdk1.8.0_60/jre/lib/jce.jar:/opt/jdk1.8.0_60/jre/lib/charsets.jar:/opt/jdk1.8.0_60/jre/lib/jfr.jar:/opt/jdk1.8.0_60/jre/classes"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="maven.home" value="/opt/maven"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="sun.cpu.isalist" value=""/>
+  </properties>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="oneNodeEmptyHtmlLikeTreeWithComments" time="0.059"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingOneFirstLevelSkippedOpeningTagSelfPolicy" time="0.053"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingWrongParalellyOpenedAndClosedTagsDefaultRemovedPolicy" time="0.074"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyFirstLevelSkippedOpeningTagsNextSamePolicy" time="0.974"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyFirstLevelSkippedOpeningTagsSelfPolicy" time="0.77"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyFirstLevelSkippedOpeningTagsDefaultPolicy" time="0.108"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyFirstLevelOneNestedSkippedOpeningTagsSelfPolicy" time="0.007"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="treeWithNestedNamedTags" time="0.144"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingOneFirstLevelSkippedOpeningTagNextSamePolicy" time="0.003"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="oneNodeEmptyXmlLikeTreeWithComments" time="0.001"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyNestedSkippedOpeningTagsNextSamePolicy" time="0.154"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="oneNodeTreeWithNamelessTags" time="0.001"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="noTree" time="0"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingOneFirstLevelSkippedOpeningTagDefaultPolicy" time="0.17"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingWrongParalellyOpenedAndClosedTagsSelfRemovedPolicy" time="0.036"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingWrongParalellyOpenedAndClosedTagsSelfDefaultPolicy" time="0.005"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyNestedSkippedOpeningTagsDefaultPolicy" time="0.124"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingSkippedClosingTagsRemovedPolicy" time="0.623"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingWrongParalellyOpenedAndClosedTagsDefaultPolicy" time="0.267"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyNestedSkippedOpeningTagsSelfPolicy" time="0.149"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingSkippedClosingTagsDefaultPolicy" time="0.05"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyFirstLevelOneNestedSkippedOpeningTagsNextSamePolicy" time="0.041"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="treeWithEmptyNamedTags" time="0.001"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingManyFirstLevelOneNestedSkippedOpeningTagsDefaultPolicy" time="0.132"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="oneNodeEmptyTree" time="0"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="oneNodeEmptyTreeWithComments" time="0"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingOpeningTagsToBeNestedNextSameRemovedPolicy" time="0.001"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingWrongParalellyOpenedAndClosedTagsNextSameRemovedPolicy" time="0.133"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="oneNodeEmptyTreeWithRawTags" time="0"/>
+  <testcase classname="com.xzymon.xpath_searcher.core.dom.DocumentNodeRepresentationArtificialStringifyTest" name="fixingWrongParalellyOpenedAndClosedTagsNextSameDefaultPolicy" time="0.046"/>
+</testsuite>

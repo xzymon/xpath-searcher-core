@@ -140,6 +140,10 @@ public class XMLStateHolder implements StateHolder{
 		engine.removeSearchingListener(listener);
 	}
 	
+	/**
+	 * Dokonuje powiązania wszystkich węzłów drzewa dokumentu z ich położeniem w strumieniu
+	 * @return
+	 */
 	private int bindElementsToText(){
 		int boundElements = 0;
 		Node xPathNode = null;
